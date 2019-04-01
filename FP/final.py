@@ -1,4 +1,5 @@
 # draw.py
+#corinne
 # # apt-get install python-pygame  or pip install pygame
 import socket                   # Import socket module
 import time
