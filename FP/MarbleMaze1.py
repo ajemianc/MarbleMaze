@@ -4,6 +4,7 @@ import socket                   # Import socket module
 import time
 import pygame
 import Adafruit_ADXL345
+import sys
 pygame.init()
 accel = Adafruit_ADXL345.ADXL345(address=0x53, busnum=0)
 
@@ -32,6 +33,10 @@ color = RED
 clock = pygame.time.Clock()
 x = 50
 y = 50
+#Create a timer
+time_start = time.time()
+seconds = 0
+minutes = 0
 
 def updatePoints(x,y):
   #x, y, z = accel.read()
@@ -40,11 +45,18 @@ def updatePoints(x,y):
   return x,y
 
 while (True):
+  sys.stdout.write("\r{minutes} Minutes {seconds} Seconds".format(minutes=minutes, seconds=seconds))
+  sys.stdout.flush()
+  time.sleep(1)
+  seconds = int(time.time() - time_start) - minutes * 60
+  if seconds >= 60:
+    minutes += 1
+    seconds = 0
  
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       pygame.quit(); sys.exit();
-    for i in range(0,10):
+    while seconds %1==0:
   #erase the screen
       screen.fill(WHITE)
 
@@ -71,24 +83,21 @@ while (True):
   #    pygame.display.flip()
   #    clock.tick(60)
 #######SOCKET Portion###############   	
-    if event.type == pygame.MOUSEBUTTONDOWN and event.button == MID:
-      pygame.image.save(screen, "screenshot.png")
- 
-      s = socket.socket()             # Create a socket object
-      host = socket.gethostname()     # Get local machine name
-      port = 40000                    # Reserve a port for your service.
-     
-      s.connect(('131.128.49.109', port))
-    # Try get some sleep
-      time.sleep(3)
-      filename='screenshot.png'
-      f = open(filename,'rb')
-      l = f.read(1024)
-      while (l):
-        s.send(l)
-        l = f.read(1024)
-      f.close()
-     
-      print('Done sending')
-      s.close()
-      print('connection closed')
+s = socket.socket()             # Create a socket object
+host = socket.gethostname()     # Get local machine name
+port = 40000                    # Reserve a port for your service.
+
+s.connect(('131.128.49.109', port))
+# Try get some sleep
+time.sleep(3)
+filename='screenshot.png'
+f = open(filename,'rb')
+l = f.read(1024)
+while (l):
+  s.send(l)
+  l = f.read(1024)
+f.close()
+
+print('Done sending')
+s.close()
+print('connection closed')
