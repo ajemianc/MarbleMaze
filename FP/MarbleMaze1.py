@@ -13,14 +13,16 @@ accel = Adafruit_ADXL345.ADXL345(address=0x53, busnum=0)
 WHITE = (255,255,255)
 RED = (255, 0, 0)
 BLACK = (0,0,0)
+GREEN = (30, 105, 53)
+GOLD = (255, 215, 0)
 #Sizes
 size = width, height = 800, 480
 screen = pygame.display.set_mode(size)
 #Directions
 DOWN = 0
-LEFT = 1
-RIGHT = 3
-MID = 2
+LEFT = 0
+RIGHT = 0
+UP = 0
 #Drawings
 theDrawing = []
 Drawings = []
@@ -31,57 +33,116 @@ xc = 50		#x-coordinate (starting position)
 yc = 50		#y-coordinate (starting position)
 color = RED
 clock = pygame.time.Clock()
-x = 50
-y = 50
 #Create a timer
-time_start = time.time()
 seconds = 0
 minutes = 0
+#Counter
+count = 0
+#goal coordinates
+goal = (0,0)
+#Points
+Points = 75
 
-def updatePoints(x,y):
-  #x, y, z = accel.read()
-  x +=3
-  y +=3
+def updatePoints():
+  a, b, c = accel.read()
+  #print('X={0}, Y={1}'.format(a, b))
+  if a > 2:
+    RIGHT = 1
+  else: 
+    RIGHT = 0
+  if a < -3:
+    LEFT = 1
+  else: 
+    LEFT = 0
+  if b < -10:
+    DOWN = 1
+  else:
+    DOWN = 0
+  if b > -4:
+    UP = 1
+  else:
+    UP = 0
+  return DOWN, LEFT, RIGHT, UP
+
+def arithmetic(x,y):
+  x = abs(x)
+  x = x * 3.2
+  x = round(x,0)
+  x = int(x)
+  y = abs(y)
+  y = y * 1.75
+  y = round(y,0)
+  y = int(y)
   return x,y
 
+def drawBorder():
+    lineThickness = 20
+    #m, n = 800, 480
+    #for i in range(m):
+      #for j in range(n):
+    points = [(1,1), (1,479), (799,479), (799,1), (1,1)]
+    pygame.draw.lines(screen, BLACK, False, points, lineThickness)
+def Lvl1Maze(): 
+    lineThickness = 20
+    #m, n = 800, 480
+    #for i in range(m):
+      #for j in range(n):
+    points = [(80,1), (80,380), (160,380), (160,80), (200,80)]
+    pygame.draw.lines(screen, GREEN, False, points, lineThickness)
+def Goal():
+    goal = (120,350)
+    pygame.draw.circle(screen, GOLD, goal, 15)
+    
 while (True):
+  time_start = time.time()
   sys.stdout.write("\r{minutes} Minutes {seconds} Seconds".format(minutes=minutes, seconds=seconds))
   sys.stdout.flush()
   time.sleep(1)
   seconds = int(time.time() - time_start) - minutes * 60
-  if seconds >= 60:
-    minutes += 1
-    seconds = 0
- 
+  
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       pygame.quit(); sys.exit();
-    while seconds %1==0:
-  #erase the screen
-      screen.fill(WHITE)
 
-  # Read the X, Y, Z axis acceleration values and print them.
-      
-      
-      pygame.draw.circle(screen,color,(x,y), 15)
-      x, y, z = accel.read()
-      print('X={0}, Y={1}'.format(x, y))
-      x = abs(x)
-      x = x * 3
-      x = int(x)
-      y = abs(y)
-      y = y * 1.7
-      y = round(y,0)
-      y = int(y)
-      #pygame.draw.circle(screen,color,(x,y), 15)
-      pygame.display.flip()
-    
-  #for i in range(0,10):
-  #    x, y, z = accel.read()
-  #    print('X={0}, Y={1}, Z={2}'.format(x, y, z))
-  
-  #    pygame.display.flip()
-  #    clock.tick(60)
+    constant = 1
+    time_start = time.time()
+    #Start position of Marble
+    x = 15
+    y = 15
+    while constant %1==0:
+        #start game timer for points
+        seconds = int(time.time() - time_start) - minutes * 60
+        #Reset Screen
+        screen.fill(WHITE)
+        drawBorder()
+        Lvl1Maze()
+        Goal()
+        #update circle
+        print('X={0}, Y={1}'.format(x, y))
+        if DOWN == 1:
+          y += 5
+        if UP == 1:
+          y -= 5
+        if RIGHT == 1:
+          x += 5
+        if LEFT == 1:
+          x-= 5
+        
+        pygame.draw.circle(screen,color,(x,y), 15)
+        DOWN, LEFT, RIGHT, UP = updatePoints()
+        print(DOWN)
+
+        #x,y = arithmetic(x,y)
+        print("Points =",Points)
+        print("Seconds =", seconds)
+        if seconds%10 == 0:
+          Points += 1
+        pygame.display.flip()
+        time_elapsed = (time.time() - time_start)
+        print(time_elapsed)
+        #time.sleep(0.20)
+        time.sleep(0.1)
+
 #######SOCKET Portion###############   	
 s = socket.socket()             # Create a socket object
 host = socket.gethostname()     # Get local machine name
