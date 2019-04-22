@@ -1,5 +1,4 @@
-# draw.py
-# # apt-get install python-pygame  or pip install pygame
+# MarbleMaze1.py
 import socket                   # Import socket module
 import time
 import pygame
@@ -8,31 +7,9 @@ import sys
 import random
 import os
 
-#from Player import Player 
-#from Player import Wall 
-#Variables
 #Colors
 WHITE = (255,255,255)
-RED = (255, 0, 0)
 BLACK = (0,0,0)
-GREEN = (30, 105, 53)
-GOLD = (255, 215, 0)
-DARK_PURPLE = (92, 46, 152)
-#Level 1 Colors
-PINK1 = (254, 233, 236)
-GREEN1 = (230, 255, 182)
-BLUE1 = (182, 255, 244)
-PURPLE1 = (208, 182, 255)
-#Level 2 Colors
-PINK2 = (255, 106, 222)
-GREEN2 = (106,255,139)
-BLUE2 = (106,147,255)
-YELLOW2 = (255, 214, 106)
-#Level 3 Colors
-RED3 = (255, 86, 89)
-GREEN3 = (172,255,89)
-BLUE3 = (89,255,255)
-PURPLE3 = (172, 89, 255)
 #Sizes
 size = width, height = 800, 480
 
@@ -92,12 +69,19 @@ def timer_text(text, font):
     return textSurface, textSurface.get_rect()
     
 def Score(Points):
-
   largeText = pygame.font.Font('freesansbold.ttf',15)
   TextSurf, TextRect = score_text("Score =" +str(Points), largeText)
   TextRect.center = ( ((width/2)-60),(460))
   screen.blit(TextSurf, TextRect)
 
+def Wait(counter):
+  wait_text = ["Get Ready!", "3","2","1","GO"]
+  largeText = pygame.font.Font('freesansbold.ttf',30)
+  TextSurf, TextRect = white_text(wait_text[counter], largeText)
+  TextRect.center = ( ((width/2)),(height/2))
+  screen.blit(TextSurf, TextRect)
+  pygame.display.update()
+  
 def Display_timer(timer):
 
   largeText = pygame.font.Font('freesansbold.ttf',15)
@@ -245,32 +229,26 @@ def info_screen():
         textSurf, textRect = white_text(info_words[6], smallText)
         textRect.center = info_placement[6]
         screen.blit(textSurf, textRect)
-        
-        
-        
+         
         pygame.display.update()
         clock.tick(15)
     return Play,Info,Intro
 
-def game_win():
+def game_win(Points):
 
     Win = True
     while Win:
         screen.fill((7,13,89))
         mouse = pygame.mouse.get_pos() 
-        if 200+100 > mouse[0] > 200 and 320+40 > mouse[1] > 320:
-            Restart_button = pygame.draw.rect(screen, (206,221,239), (200,320,100,40))
+        if 3600+100 > mouse[0] > 360 and 320+40 > mouse[1] > 320:
+            Restart_button = pygame.draw.rect(screen, (206,221,239), (350,320,100,40))
         else:
-            Restart_button = pygame.draw.rect(screen, (88, 147, 212),(200,320,100,40))
-        if 500+120 > mouse[0] > 500 and 320+40 > mouse[1] > 320:
-            Save_button = pygame.draw.rect(screen,(206,221,239), (500,320,120,40)) 
-        else:
-            Save_button = pygame.draw.rect(screen, (88, 147, 212),(500,320,120,40))
+            Restart_button = pygame.draw.rect(screen, (88, 147, 212),(350,320,100,40))
+        
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()   
                 is_inside = Restart_button.collidepoint(pos)
-                save_click = Save_button.collidepoint(pos) 
                 if is_inside:    
                     Win = False
                     Intro = True
@@ -278,17 +256,12 @@ def game_win():
                 pygame.quit()
                 quit()
                 
-        win_words = ["Restart", "Save Score"]
-        win_placement = [(250,340), (550,340)]       
+        win_words = ["Restart"]
+        win_placement = [(400,340)]       
         #Start
         smallText = pygame.font.Font("freesansbold.ttf",20)
         textSurf, textRect = black_text(win_words[0], smallText)
         textRect.center = win_placement[0]
-        screen.blit(textSurf, textRect)
-        #Back
-        smallText = pygame.font.Font("freesansbold.ttf",20)
-        textSurf, textRect = black_text(win_words[1], smallText)
-        textRect.center = win_placement[1]
         screen.blit(textSurf, textRect)
         
         largeText = pygame.font.Font('freesansbold.ttf',120)
@@ -296,7 +269,12 @@ def game_win():
         TextRect.center = ((width/2),(height/4))
         screen.blit(TextSurf, TextRect)
         
+        largeText = pygame.font.Font('freesansbold.ttf',50)
+        TextSurf, TextRect = white_text("Score = " +str(Points), largeText)
+        TextRect.center = ( ((width/2)),200)
+        screen.blit(TextSurf, TextRect)
         pygame.display.update()
+        
         clock.tick(15)
     return Intro, Win
            
@@ -306,14 +284,10 @@ def game_over():
     while Lose:
         screen.fill((95,0,0))
         mouse = pygame.mouse.get_pos() 
-        if 200+100 > mouse[0] > 200 and 320+40 > mouse[1] > 320:
-            Restart_button = pygame.draw.rect(screen, (221,0,0), (200,320,100,40))
+        if 3600+100 > mouse[0] > 360 and 320+40 > mouse[1] > 320:
+            Restart_button = pygame.draw.rect(screen, (221,0,0), (350,320,100,40))
         else:
-            Restart_button = pygame.draw.rect(screen, (189, 0, 0),(200,320,100,40))
-        if 500+120 > mouse[0] > 500 and 320+40 > mouse[1] > 320:
-            Save_button = pygame.draw.rect(screen,(221,0,0), (480,320,120,40)) 
-        else:
-            Save_button = pygame.draw.rect(screen, (189, 0, 0),(480,320,120,40))
+            Restart_button = pygame.draw.rect(screen, (189, 0, 0),(350,320,100,40))
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()   
@@ -330,17 +304,12 @@ def game_over():
         TextRect.center = ((width/2),(height/4))
         screen.blit(TextSurf, TextRect)
 
-        lose_words = ["Restart", "Save Score"]
-        lose_placement = [(250,340), (530,340)]       
+        lose_words = ["Restart"]
+        lose_placement = [(400,340)]       
         #Restart
         smallText = pygame.font.Font("freesansbold.ttf",20)
         textSurf, textRect = red_text(lose_words[0], smallText)
         textRect.center = lose_placement[0]
-        screen.blit(textSurf, textRect)
-        #Save Score
-        smallText = pygame.font.Font("freesansbold.ttf",20)
-        textSurf, textRect = red_text(lose_words[1], smallText)
-        textRect.center = lose_placement[1]
         screen.blit(textSurf, textRect)
         
         pygame.display.update()
@@ -354,22 +323,22 @@ def updatePoints():
   print('X={0}, Y={1}'.format(a, b))
   if a > 2:
     RIGHT = 1
-    Rratio = abs((a/255.0) * 10.0) * 2.0
+    Rratio = abs((a/255.0) * 10.0) * 3.0
   else: 
     RIGHT = Rratio = 0
   if a < -12:
     LEFT = 1
-    Lratio = abs((a/270.0) * 10.0) * 2.0
+    Lratio = abs((a/270.0) * 10.0) * 3.0
   else: 
     LEFT = Lratio = 0
   if b < -15:
     DOWN = 1
-    Dratio = abs((b/262.0) * 10.0)
+    Dratio = abs((b/262.0) * 10.0) * 3.0
   else:
     DOWN = Dratio = 0
   if b > -7:
     UP = 1
-    Uratio = abs((b/252.0) * 10.0) * 2.0
+    Uratio = abs((b/252.0) * 10.0) * 3.0
   else:
     UP = Uratio = 0
   return DOWN, Dratio, LEFT, Lratio, RIGHT, Rratio, UP, Uratio
@@ -389,8 +358,9 @@ def game(player, end_rect):
   #Directions
   DOWN = LEFT = RIGHT = UP = 0
   #Timer values
-  lvls_timer = [10, 30, 20]
-  timer = lvls_timer[0]
+  lvls_timer = [35, 35, 15]
+  lvl_counter = 0
+  timer = lvls_timer[lvl_counter]
   minutes = 0
   time_start = time.time()
   while Play:
@@ -399,216 +369,222 @@ def game(player, end_rect):
         pygame.quit(); sys.exit();
     #start game timer for points
     seconds = int(time.time() - time_start) - minutes * 60
+    print(seconds)
     #Reset Screen
     screen.fill(Background_color)
-    #Update movement
-    if DOWN == 1:
-      player.move(0, Dratio)
-    if UP == 1:
-      Uratio = Uratio * -1
-      player.move(0, Uratio)
-    if RIGHT == 1:
-      player.move(Rratio, 0)
-    if LEFT == 1:
-      Lratio = Lratio * -1
-      player.move(Lratio, 0)
-    DOWN, Dratio, LEFT, Lratio, RIGHT, Rratio, UP, Uratio = updatePoints()
-          # Draw marble over Rect
-    (x,y,a,b)=player.rect
-    x= x+6
-    y= y+6
-    marble=pygame.draw.circle(screen,Player_color,(x,y), 12)
-    # Time Count Down
-    if timer > 0:
-      timer = lvls_timer[0] - seconds
+    if seconds < 5:
+      for wall in walls:
+      	pygame.draw.rect(screen, Wall_color, wall.rect)
+      Wait(seconds)
     else:
-      Play = False
-      Win = False
-      Lose = True
-            
-    for wall in walls:
-      if  marble.colliderect(wall.rect):
-        Points = Points - 1
-            
-    #New Level
-    if player.rect.colliderect(end_rect):
-      Points += timer
-      timer = 60    
-      if Level == Final_Level:
+      #Update movement
+      if DOWN == 1:
+        player.move(0, Dratio)
+      if UP == 1:
+        Uratio = Uratio * -1
+        player.move(0, Uratio)
+      if RIGHT == 1:
+        player.move(Rratio, 0)
+      if LEFT == 1:
+        Lratio = Lratio * -1
+        player.move(Lratio, 0)
+      DOWN, Dratio, LEFT, Lratio, RIGHT, Rratio, UP, Uratio = updatePoints()
+      # Draw marble over Rect
+      (x,y,a,b)=player.rect
+      x= x+6
+      y= y+6
+      marble=pygame.draw.circle(screen,Player_color,(x,y), 12)
+      # Time Count Down
+      if timer > 0:
+        timer = lvls_timer[lvl_counter] - seconds
+      else:
         Play = False
-        Win = True
-        Lose = False
-      elif Level ==2:
-        Points += lvls_winpoints[1]
-        Level = 3
-        del walls[:]
-        Wall_color = (227, 227, 227)
-        Player_color = (203, 55, 55)
-        Background_color = (238, 111, 87)
-        Goal_color = (250, 250, 250)
-        Start_place = (300,32, 12, 12)
-        player = Player() # Create the player
-        x = y = 0
-        for row in level3:
-            for col in row:
-                if col == "W":
-                    Wall((x, y))
-                if col == "E":
-                    end_rect = pygame.Rect(x, y, 16, 16)
-                x += 16
-            y += 16
-            x = 0
-      elif Level == 1:
-        Points += lvls_winpoints[0]
-        Level = 2
-        del walls[:]
-        Wall_color = (205, 69, 69)
-        Player_color = (241, 104, 33)
-        Background_color = (243, 163, 51)
-        Goal_color = (255, 254, 154)
-        Start_place = (300,32, 12, 12)
-        player = Player() #Reset Player
-        x = y = 0
-        for row in level2:
-            for col in row:
-                if col == "W":
-                    Wall((x, y))
-                if col == "E":
-                    end_rect = pygame.Rect(x, y, 16, 16)
-                x += 16
-            y += 16
-            x = 0
+        Win = False
+        Lose = True          
+      for wall in walls:
+        if  marble.colliderect(wall.rect):
+          Points = Points - 1
+          if Points <= 0:
+            Points = 0         
+      #New Level
+      if player.rect.colliderect(end_rect):
+        time_start = time.time()
+        Points += lvls_winpoints[lvl_counter]
+        lvl_counter +=1
+        Points += timer
+        timer = 60    
+        if Level == Final_Level:
+          Play = False
+          Win = True
+          Lose = False
+        elif Level ==2:
+          Level = 3
+          del walls[:]
+          Wall_color = (227, 227, 227)
+          Player_color = (203, 55, 55)
+          Background_color = (238, 111, 87)
+          Goal_color = (250, 250, 250)
+          Start_place = (400,32, 12, 12)
+          player.rect = pygame.Rect(Start_place)
+          x = y = 0
+          for row in level3:
+              for col in row:
+                  if col == "W":
+                      Wall((x, y))
+                  if col == "E":
+                      end_rect = pygame.Rect(x, y, 80, 16)
+                  x += 16
+              y += 16
+              x = 0
+        elif Level == 1:
+          Level = 2
+          del walls[:]
+          Wall_color = (205, 69, 69)
+          Player_color = (241, 104, 33)
+          Background_color = (243, 163, 51)
+          Goal_color = (255, 254, 154)
+          Start_place = (750,32, 12, 12)
+          player.rect = pygame.Rect(Start_place)
+          x = y = 0
+          for row in level2:
+              for col in row:
+                  if col == "W":
+                      Wall((x, y))
+                  if col == "E":
+                      end_rect = pygame.Rect(x, y, 16, 80)
+                  x += 16
+              y += 16
+              x = 0
       #Draw screen
-    for wall in walls:
-    	pygame.draw.rect(screen, Wall_color, wall.rect)
-    Score(Points)
-    Display_timer(timer)
-    pygame.draw.rect(screen, Goal_color, end_rect)
-    pygame.draw.rect(screen, Player_color, player.rect)
-    pygame.display.flip()
-    #Sleep Time
-    time_elapsed = (time.time() - time_start)
-    #print(time_elapsed)
-    time.sleep(0.1)
-  return Play, Win, Lose 
-       
-Start_place = (50,50,12,12)
-walls = []
-player = Player() # Create the player
-level1 = [         #50 by 30
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"W     WW                                          ",
-"W     WW                                           ",
-"W    EWW                                           ",
-"W     WW       WWWWWWWWWWWWWWWWWWWWWWWWWWWWW     W",
-"W     WW       WWWWWWWWWWWWWWWWWWWWWWWWWWWWW     W",
-"W     WW                                  WW     W",
-"W     WW                                  WW     W",
-"W     WW                                  WW     W",
-"W     WWWWWWWWWWWWW       WWWWWWW         WW     W",
-"W     WWWWWWWWWWWWW       WWWWWWW         WW     W",
-"W                WW                       WW     W",
-"W                WW                       WW     W",
-"W                WW                       WW     W",
-"W     WW         WWWWWWWWWWWWWWWW         WW     W",
-"W     WW         WWWWWWWWWWWWWWWW         WW     W",
-"W     WW         WW                       WW     W",
-"W     WW         WW                       WW     W",
-"W     WW         WW               WWWWWWWWWWWWWWWW",
-"W     WW         WW               WWWWWWWWWWWWWWWW",
-"W     WW                                         W",
-"W     WW                                         W",
-"W     WW                                         W",
-"W     WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W",
-"W     WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-]
-level2 = [         #50 by 30
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                  E                              W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"W                                                W",
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-]
-level3 = [         #50 by 30
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"W                                                 ",
-"W                                                 ",
-"W     WW                                          ",
-"W     WW                                         W",
-"W     WW                                         W",
-"W     WW                                  WW     W",
-"W     WW                                  WW     W",
-"W     WW                                  WW     W",
-"W     WWWWWWWWWWWWW       WWWWWWW         WW     W",
-"W  E  WWWWWWWWWWWWW       WWWWWWW         WW     W",
-"W                WW       WWWWWWW         WW     W",
-"W                WW                       WW     W",
-"W     WW         WW                       WW     W",
-"W     WW         WWWWWWWWWWWWWWWWWW       WW     W",
-"W     WW         WWWWWWWWWWWWWWWWWW       WW     W",
-"W     WW         WW                       WW     W",
-"W     WW         WW                       WW     W",
-"W     WW         WW             WWWWWWWWWWWWWWWWWW",
-"W     WW         WW             WWWWWWWWWWWWWWWWWW",
-"W     WW         WW                              W",
-"W     WW         WW                              W",
-"W     WW                    WWWWWWWWWWWWWWW      W",
-"W     WW                    WWWWWWWWWWWWWWW      W",
-"W     WW                    WWWWWWWWWWWWWWW      W",
-"W     WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W",
-"W     WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W",
-"W                                                W",
-"W                                                W",
-"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-]
-x = y = 0
-for row in level1:
-    for col in row:
-        if col == "W":
-            Wall((x, y))
-        if col == "E":
-            end_rect = pygame.Rect(x, y, 16, 80)
-        x += 16
-    y += 16
-    x = 0
-count = 0
+      for wall in walls:
+      	pygame.draw.rect(screen, Wall_color, wall.rect)
+      Score(Points)
+      Display_timer(timer)
+      pygame.draw.rect(screen, Goal_color, end_rect)
+      pygame.draw.rect(screen, Player_color, player.rect)
+      pygame.display.flip()
+      #Sleep Time
+      time_elapsed = (time.time() - time_start)
+      #print(time_elapsed)
+      time.sleep(0.1)
+  return Play, Win, Lose, Points 
+
 Game = True
 Intro = True
 Lose = False
 Win = False
-while Game:
+while Game:      
+  walls = []
   Start_place = (50,50,12,12)
   player = Player() # Create the player
+  level1 = [         #50 by 30
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "W     WW                                         E",
+  "W     WW                                          ",
+  "W     WW                                          ",
+  "W     WW       WWWWWWWWWWWWWWWWWWWWWWWWWWWWW     W",
+  "W     WW       WWWWWWWWWWWWWWWWWWWWWWWWWWWWW     W",
+  "W     WW                                  WW     W",
+  "W     WW                                  WW     W",
+  "W     WW                                  WW     W",
+  "W     WWWWWWWWWWWWW       WWWWWWW         WW     W",
+  "W     WWWWWWWWWWWWW       WWWWWWW         WW     W",
+  "W                WW                       WW     W",
+  "W                WW                       WW     W",
+  "W                WW                       WW     W",
+  "W     WW         WWWWWWWWWWWWWWWW         WW     W",
+  "W     WW         WWWWWWWWWWWWWWWW         WW     W",
+  "W     WW         WW                       WW     W",
+  "W     WW         WW                       WW     W",
+  "W     WW         WW               WWWWWWWWWWWWWWWW",
+  "W     WW         WW               WWWWWWWWWWWWWWWW",
+  "W     WW                                         W",
+  "W     WW                                         W",
+  "W     WW                                         W",
+  "W     WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W",
+  "W     WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  ]
+  level2 = [         #50 by 30
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "E     WW                                         W",
+  "      WW                                         W",
+  "      WW                                         W",
+  "W     WW       WWWWWWWWWWWWWWWWWWWWWWWWWWWWW     W",
+  "W     WW       WWWWWWWWWWWWWWWWWWWWWWWWWWWWW     W",
+  "W     WW                                  WW     W",
+  "W     WW                                  WW     W",
+  "W     WW                                  WW     W",
+  "W     WWWWWWWWWWWWW       WWWWWWW         WW     W",
+  "W     WWWWWWWWWWWWW       WWWWWWW         WW     W",
+  "W                WW                       WW     W",
+  "W                WW                       WW     W",
+  "W                WW                       WW     W",
+  "W     WW         WWWWWWWWWWWWWWWW         WW     W",
+  "W     WW         WWWWWWWWWWWWWWWW         WW     W",
+  "W     WW         WW                       WW     W",
+  "W     WW         WW                       WW     W",
+  "W     WW         WW               WWWWWWWWWWWWWWWW",
+  "W     WW         WW               WWWWWWWWWWWWWWWW",
+  "W     WW                                         W",
+  "W     WW                                         W",
+  "W     WW                                         W",
+  "W     WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W",
+  "W     WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW      W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  ]
+  level3 = [         #50 by 30
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "W   E               WW      WW     E             W",
+  "W                   WW      WW                   W",
+  "W                   WW      WW                   W",
+  "W                   WW      WW                   W",
+  "W         WW        WW      WW        WW         W",
+  "W         WW        WW      WW        WW         W",
+  "W         WW        WW      WW        WW         W",
+  "W         WW        WW      WW        WW         W",
+  "W         WWWWWWWWWWWW      WWWWWWWWWWWW         W",
+  "W         WWWWWWWWWWWW      WWWWWWWWWWWW         W",
+  "W                   WW      WW                   W",
+  "W                   WW      WW                   W",
+  "W                   WW      WW                   W",
+  "W     WW            WW      WW            WW     W",
+  "W     WW            WW      WW            WW     W",
+  "W     WW            WW      WW            WW     W",
+  "W     WW            WW      WW            WW     W",
+  "W     WW            WW      WW            WW     W",
+  "W     WW            WW      WW            WW     W",
+  "W     WW            WW      WW            WW     W",
+  "W     WW            WW      WW            WW     W",
+  "W     WW            WW      WW            WW     W",
+  "W     WWWWWWWWWWWWWWWW      WWWWWWWWWWWWWWWW     W",
+  "W     WWWWWWWWWWWWWWWW      WWWWWWWWWWWWWWWW     W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  ]
+  x = y = 0
+  for row in level1:
+      for col in row:
+          if col == "W":
+              Wall((x, y))
+          if col == "E":
+              end_rect = pygame.Rect(x, y, 16, 80)
+          x += 16
+      y += 16
+      x = 0
+  count = 0
+
   #Initialize screen, clock, G-Senosr, Game
   screen = pygame.display.set_mode(size)
   clock = pygame.time.Clock()
@@ -620,11 +596,11 @@ while Game:
   elif Info:
     Play,Info,Intro = info_screen()
   elif Play:
-    Play, Win, Lose = game(player, end_rect)
+    Play, Win, Lose, Points = game(player, end_rect)
   elif Lose:
     Intro, Lose = game_over()
   elif Win:
-    Intro, Win = game_win()
+    Intro, Win = game_win(Points)
 
 #######SOCKET Portion###############   	
 s = socket.socket()             # Create a socket object
