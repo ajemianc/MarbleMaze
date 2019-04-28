@@ -6,7 +6,104 @@ import Adafruit_ADXL345
 import sys
 import random
 import os
+import webbrowser
+import os.path
+import re
+import urllib
+from bs4 import BeautifulSoup
 
+######## Web Page ###########################
+#Scoreboard
+
+scoresAndRanks = []	#array alternating with rank & corresponding scores
+highScores = []		#array of just the high scores
+highScorers = []	#array of names of the high scorers
+
+#helper function to remove tags
+TAG_RE = re.compile(r'<[^>]+>')
+
+def remove_tags(text):
+    return TAG_RE.sub('', text)
+
+#Maps the line numbers where each winner is stored in the HTML file (minus one)
+firstLN = 19
+secondLN = 25
+thirdLN = 30
+fourthLN = 35
+fifthLN = 40
+
+#Find and open highScores.html 
+#Website: http://131.128.49.34/highScores.html	
+save_path = '/var/www/'
+name_of_file = 'scoreboard'
+completeName = os.path.join(save_path, name_of_file+".html") 
+f = open(completeName, "r")
+
+url = completeName
+html = urllib.urlopen(url).read()
+soup = BeautifulSoup(html)
+
+# kill all script and style elements
+for script in soup(["script", "style"]):
+    script.extract()    # rip it out
+
+# get all of the ranks and scores
+text = soup.get_text()
+scoresAndRanks = re.findall('\d+', text)
+print(scoresAndRanks)
+
+#print out all ranks and scores for debugging
+i = 0
+while i < len(scoresAndRanks):
+    print(scoresAndRanks[i])
+    i += 1
+
+#make a seperate array for just the high scores
+i = 1
+print('The high Scores you need to beat are:')
+while i < len(scoresAndRanks):
+    rawScore = int(scoresAndRanks[i])
+    highScores.append(rawScore)
+    i += 2
+print(highScores)
+
+#Extract the names of the high scorers from the HTML doc, save them in highScorers[]
+for i, line in enumerate(f):
+
+   if i == firstLN:
+      firstplace = remove_tags(line)
+      firstplace = firstplace.rstrip("\n")	#remove all newline tags
+      firstplace = firstplace.strip()		#remove all trailing spaces
+      highScorers.append(firstplace)
+   elif i == secondLN:
+      secondplace = remove_tags(line)
+      secondplace = secondplace.rstrip("\n")
+      secondplace = secondplace.strip()
+      highScorers.append(secondplace)
+   elif i == thirdLN:
+      thirdplace = remove_tags(line)
+      thirdplace = thirdplace.rstrip("\n")
+      thirdplace = thirdplace.strip()
+      highScorers.append(thirdplace)
+   elif i == fourthLN:
+      fourthplace = remove_tags(line)
+      fourthplace = fourthplace.rstrip("\n")
+      fourthplace = fourthplace.strip()
+      highScorers.append(fourthplace)
+   elif i == fifthLN:
+      fifthplace = remove_tags(line)
+      fifthplace = fifthplace.rstrip("\n")
+      fifthplace = fifthplace.strip()
+      highScorers.append(fifthplace)
+   elif i > 42:
+      break
+print('the high scorers are:')
+print(highScorers)
+#print(text)
+
+f.close()
+
+############################################################
 #Colors
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -63,7 +160,7 @@ def pink_text(text, font):
 def Score(Points):
   largeText = pygame.font.Font('freesansbold.ttf',15)
   TextSurf, TextRect = black_text("Score =" +str(Points), largeText)
-  TextRect.center = ( ((width/2)-60),(460))
+  TextRect.center = ((width/2)-100,465)
   screen.blit(TextSurf, TextRect)
 
 def Wait(counter):
@@ -76,10 +173,33 @@ def Wait(counter):
   
 def Display_timer(timer):
   largeText = pygame.font.Font('freesansbold.ttf',15)
-  TextSurf, TextRect = black_text("Timer =" +str(timer), largeText)
-  TextRect.center = ( ((width/2)+60),(460))
+  TextSurf, TextRect = black_text("Timer = " +str(timer), largeText)
+  TextRect.center = ( ((width/2)),(465))
   screen.blit(TextSurf, TextRect)
-  
+
+def Display_lvl(Level):
+  Lvl_Names = ["","-->","Reverse","Ferocious Frown","The Viral Spiral","Crazy Cactus"]
+  largeText = pygame.font.Font('freesansbold.ttf',30)
+  TextSurf, TextRect = white_text("Level " +str(Level), largeText)
+  TextRect.center = ((width/2),160)
+  screen.blit(TextSurf, TextRect)
+  TextSurf, TextRect = white_text(Lvl_Names[Level], largeText)
+  TextRect.center = ((width/2),200)
+  screen.blit(TextSurf, TextRect)
+
+def quit_button(Wall_color):
+    mouse = pygame.mouse.get_pos() 
+    largeText = pygame.font.Font('freesansbold.ttf',15)
+    if 455+100 > mouse[0] > 455 and 455+20 > mouse[1] > 455:
+        Quit_button = pygame.draw.rect(screen, (Wall_color), (455,455,60,20))
+        TextSurf, TextRect = white_text("Quit", largeText)
+    else:
+        Quit_button = pygame.draw.rect(screen, (Wall_color),(455,455,60,20))
+        TextSurf, TextRect = black_text("Quit", largeText)
+    TextRect.center = ((width/2)+80,465)
+    screen.blit(TextSurf, TextRect)
+    return Quit_button
+    
 def game_intro():
 
     Play = False
@@ -227,6 +347,191 @@ def info_screen():
         clock.tick(15)
     return Play,Info,Intro
 
+def write_score(Points):
+	
+        print('points', Points)
+
+	f = open(completeName, "r")
+
+	url = completeName
+	html = urllib.urlopen(url).read()
+	soup = BeautifulSoup(html)
+
+	# kill all script and style elements
+	for script in soup(["script", "style"]):
+	    script.extract()    # rip it out
+
+	# get all of the ranks and scores
+	text = soup.get_text()
+	scoresAndRanks = re.findall('\d+', text)
+	print(scoresAndRanks)
+
+	#print out all ranks and scores for debugging
+	i = 0
+	while i < len(scoresAndRanks):
+	    print(scoresAndRanks[i])
+	    i += 1
+
+	#make a seperate array for just the high scores
+	i = 1
+	print('The high Scores you need to beat are:')
+	while i < len(scoresAndRanks):
+	    rawScore = int(scoresAndRanks[i])
+	    highScores.append(rawScore)
+	    i += 2
+	print(highScores)
+
+	#Extract the names of the high scorers from the HTML doc, save them in highScorers[]
+	for i, line in enumerate(f):
+
+	   if i == firstLN:
+	      firstplace = remove_tags(line)
+	      firstplace = firstplace.rstrip("\n")	#remove all newline tags
+	      firstplace = firstplace.strip()		#remove all trailing spaces
+	      highScorers.append(firstplace)
+	   elif i == secondLN:
+	      secondplace = remove_tags(line)
+	      secondplace = secondplace.rstrip("\n")
+	      secondplace = secondplace.strip()
+	      highScorers.append(secondplace)
+	   elif i == thirdLN:
+	      thirdplace = remove_tags(line)
+	      thirdplace = thirdplace.rstrip("\n")
+	      thirdplace = thirdplace.strip()
+	      highScorers.append(thirdplace)
+	   elif i == fourthLN:
+	      fourthplace = remove_tags(line)
+	      fourthplace = fourthplace.rstrip("\n")
+	      fourthplace = fourthplace.strip()
+	      highScorers.append(fourthplace)
+	   elif i == fifthLN:
+	      fifthplace = remove_tags(line)
+	      fifthplace = fifthplace.rstrip("\n")
+	      fifthplace = fifthplace.strip()
+	      highScorers.append(fifthplace)
+	   elif i > 42:
+	      break
+	print('the high scorers are:')
+	print(highScorers)
+	#print(text)
+
+	f.close()
+	#test to see if it's a high score	
+	newScore = Points
+	isHighScore = 0		#Assume False
+	place = 0		#Which place the user came in	
+	i = 0			#loop count
+	while i < len(highScores):
+		highscore = highScores[i]
+                print('highscore:', highscore)
+                print('NEW SCORE:', newScore)
+    		if newScore >= highscore:
+                  print(isHighScore)
+		  isHighScore = 1	#Make True
+	          place = i		#User placed in this iteration
+	          break
+    		i += 1
+
+	#If User has a high score
+	if isHighScore != 0: 
+		for event in pygame.event.get():
+			 if event.type == pygame.QUIT:
+               			pygame.quit()
+                		quit()
+		screen.fill((7,13,89))
+		largeText = pygame.font.Font('freesansbold.ttf',50)
+		TextSurf, TextRect = white_text("Enter Name in Terminal Prompt", largeText)
+		TextRect.center = ((width/2),(height/4))
+		screen.blit(TextSurf, TextRect)
+		largeText = pygame.font.Font('freesansbold.ttf',50)
+        	TextSurf, TextRect = white_text("Score = " +str(Points), largeText)
+        	TextRect.center = ( ((width/2)),200)
+        	screen.blit(TextSurf, TextRect)
+        	pygame.display.update()
+		print('Congratulations! You have a high score!')
+		replacementName = highScorers[place]
+		print('you are replacing the name', replacementName)
+		replacementScore = str(highScores[place])
+		print('you are replacing the score', replacementScore)
+		toFile = raw_input("What is your name?")
+		print('Great job,', toFile, '!')
+	#Update the high score array
+		previousHighScores=highScores[:]
+		decrementer = 4	#loop backwards so you don't overwrite
+		count = 4 - place
+		
+		while(count != 0):
+			print(decrementer)
+			highScores[decrementer] = highScores[decrementer-1]
+			count -= 1
+			decrementer -= 1
+		highScores[place] = Points
+		updatedHighScores=highScores[:]
+		print(updatedHighScores)
+	#Update the names of high scorers array
+		previousHighScorers = highScorers[:]
+		print('the previous high scores are', previousHighScorers)
+		decrementer = 4	#loop backwards so you don't overwrite
+		count = 4 - place
+		
+		while(count != 0):
+			print(decrementer)
+			highScorers[decrementer] = highScorers[decrementer-1]
+			count -= 1
+			decrementer -= 1
+		highScorers[place] = toFile
+		updatedHighScorers = highScorers[:]
+		print('the updated high scorers', updatedHighScorers)
+		updatesRequired = 5-place
+	#open the file and update the new high score
+		count = 5
+		index = 0
+		
+		while(count > 0):
+			print('loop taken')
+			print('index =', index)
+			with open(completeName,'r+') as myFile:
+    				#convert to string:
+    				data = myFile.read()
+    				myFile.seek(0)
+				replacementScore = str(previousHighScores[index])
+				replacementScore = "<b>"+ replacementScore + "</b>" #so you don't overwrite part of a score
+				print(replacementScore)
+				newScore = str(updatedHighScores[index])
+				newScore = "<b>"+ newScore + "</b>" 
+				print(newScore)
+				myFile.write(re.sub(replacementScore,newScore,data,1))
+                        	myFile.truncate()
+			index += 1
+			count -= 1
+         #open the file and update the new high scorer's name
+		count = 5
+		index = 0
+		while(count > 0):
+			print('loop taken')
+			print('index =', index)
+			with open(completeName,'r+') as myFile:
+    				#convert to string:
+    				data = myFile.read()
+    				myFile.seek(0)
+				replacementName = str(previousHighScorers[index])
+				replacementName = "<b>"+ replacementName + "</b>"
+				print(replacementName)
+				toFile = str(updatedHighScorers[index])
+				toFile = "<b>"+ toFile + "</b>"
+				print(toFile)
+				myFile.write(re.sub(replacementName,toFile,data,1))
+                        	myFile.truncate()
+			index += 1
+			count -= 1
+
+
+	#Read the names from lines 21, 27, 32, 37, 42
+
+
+
+
+
 def game_win(Points):
     
     Intro = False
@@ -250,7 +555,7 @@ def game_win(Points):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-                
+               
         win_words = ["Restart"]
         win_placement = [(400,340)]       
         #Start
@@ -269,7 +574,6 @@ def game_win(Points):
         TextRect.center = ( ((width/2)),200)
         screen.blit(TextSurf, TextRect)
         pygame.display.update()
-        
         clock.tick(15)
     return Intro, Win
            
@@ -319,22 +623,22 @@ def updatePoints():
   float(b)
   if a > 2:
     RIGHT = 1
-    Rratio = abs((a/255.0) * 10.0) * 3.0
+    Rratio = abs((a/255.0) * 10.0) * 2.0
   else: 
     RIGHT = Rratio = 0
   if a < -12:
     LEFT = 1
-    Lratio = abs((a/270.0) * 10.0) * 3.0
+    Lratio = abs((a/270.0) * 10.0) * 2.0
   else: 
     LEFT = Lratio = 0
   if b < -15:
     DOWN = 1
-    Dratio = abs((b/262.0) * 10.0) * 3.0
+    Dratio = abs((b/262.0) * 10.0) * 2.0
   else:
     DOWN = Dratio = 0
   if b > -7:
     UP = 1
-    Uratio = abs((b/252.0) * 10.0) * 3.0
+    Uratio = abs((b/252.0) * 10.0) * 2.0
   else:
     UP = Uratio = 0
   return DOWN, Dratio, LEFT, Lratio, RIGHT, Rratio, UP, Uratio
@@ -343,6 +647,7 @@ def game(player, end_rect):
   Play = True
   Win = False
   Lose = False
+  Intro = False
   #Set Colors
   Wall_color = (127, 71, 130)
   Player_color = (253, 208, 67)
@@ -356,7 +661,7 @@ def game(player, end_rect):
   Points = 100
   lvls_winpoints = [100, 200, 300, 400, 500]
   #Timer values, add extra 5 for the count down
-  lvls_timer = [35, 35, 15, 35, 35]
+  lvls_timer = [35, 35, 25, 35, 35]
   lvl_counter = 0
   timer = lvls_timer[lvl_counter]
   minutes = 0
@@ -372,9 +677,17 @@ def game(player, end_rect):
     if seconds < 5:
       for wall in walls:
       	pygame.draw.rect(screen, Wall_color, wall.rect)
+      Display_lvl(Level)
       Wait(seconds)
     else:
-      print("Level = ", Level) 
+      Quit_button = quit_button(Wall_color)
+      for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONUP:
+          pos = pygame.mouse.get_pos()   
+          quit_click = Quit_button.collidepoint(pos)
+          if quit_click:    
+            Play = False
+            Intro = True 
       #Update movement
       if DOWN == 1:
         player.move(0, Dratio)
@@ -412,17 +725,18 @@ def game(player, end_rect):
         lvl_counter +=1
         Points += timer
         timer = 60   
-        if Level == 5:
+        if Level == Final_Level:
           Play = False
           Win = True
           Lose = False
+#Keara update
         elif Level == 4:
           Level = 5
           del walls[:]
-          Wall_color = (227, 227, 227)
-          Player_color = (203, 55, 55)
-          Background_color = (238, 111, 87)
-          Goal_color = (250, 250, 250)
+          Wall_color = (169, 238, 194) 
+          Player_color = (243, 129, 129)
+          Background_color = (112, 87, 114)
+          Goal_color = (250, 210, 132)
           Start_place = (400,32, 12, 12)
           player.rect = pygame.Rect(Start_place)
           x = y = 0
@@ -435,15 +749,16 @@ def game(player, end_rect):
                   x += 16
               y += 16
               x = 0
+#keara update
         elif Level == 3:
           print("Level = ", Level)
           Level = 4
           del walls[:]
-          Wall_color = (227, 227, 227)
-          Player_color = (203, 55, 55)
-          Background_color = (238, 111, 87)
-          Goal_color = (250, 250, 250)
-          Start_place = (400,32, 12, 12)
+          Wall_color = (0, 189, 86)
+          Player_color = (32, 125, 255)
+          Background_color = (133, 239, 71)
+          Goal_color = (249, 253, 80)
+          Start_place = (750,20, 12, 12)
           player.rect = pygame.Rect(Start_place)
           x = y = 0
           for row in level4:
@@ -458,11 +773,11 @@ def game(player, end_rect):
         elif Level == 2:
           Level = 3
           del walls[:]
-          Wall_color = (227, 227, 227)
-          Player_color = (203, 55, 55)
-          Background_color = (238, 111, 87)
-          Goal_color = (250, 250, 250)
-          Start_place = (400,32, 12, 12)
+          Wall_color = (0, 209, 205)
+          Player_color = (243, 0, 103)
+          Background_color = (68, 68, 68)
+          Goal_color = (234, 234, 234)
+          Start_place = (400,400, 12, 12)
           player.rect = pygame.Rect(Start_place)
           x = y = 0
           for row in level3:
@@ -477,10 +792,10 @@ def game(player, end_rect):
         elif Level == 1:
           Level = 2
           del walls[:]
-          Wall_color = (205, 69, 69)
-          Player_color = (241, 104, 33)
-          Background_color = (243, 163, 51)
-          Goal_color = (255, 254, 154)
+          Wall_color = (52, 49, 79)
+          Player_color = (45, 168, 185)
+          Background_color = (105, 45, 183)
+          Goal_color = (129, 88, 252)
           Start_place = (750,32, 12, 12)
           player.rect = pygame.Rect(Start_place)
           x = y = 0
@@ -496,13 +811,14 @@ def game(player, end_rect):
       #Draw screen
       for wall in walls:
       	pygame.draw.rect(screen, Wall_color, wall.rect)
+      Quit_button = quit_button(Wall_color)
       Score(Points)
       Display_timer(timer)
       pygame.draw.rect(screen, Goal_color, end_rect)
       pygame.draw.rect(screen, Player_color, player.rect)
       pygame.display.flip()
-      time.sleep(0.1)
-  return Play, Win, Lose, Points 
+      time.sleep(0.05)
+  return Play, Win, Lose, Points, Intro 
 
 Game = True
 Intro = True
@@ -576,31 +892,31 @@ while Game:
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   ]
   level3 = [         #50 by 30
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "W   E               WW      WW     E             W",
-  "W                   WW      WW                   W",
-  "W                   WW      WW                   W",
-  "W                   WW      WW                   W",
-  "W         WW        WW      WW        WW         W",
-  "W         WW        WW      WW        WW         W",
-  "W         WW        WW      WW        WW         W",
-  "W         WW        WW      WW        WW         W",
-  "W         WWWWWWWWWWWW      WWWWWWWWWWWW         W",
-  "W         WWWWWWWWWWWW      WWWWWWWWWWWW         W",
-  "W                   WW      WW                   W",
-  "W                   WW      WW                   W",
-  "W                   WW      WW                   W",
-  "W     WW            WW      WW            WW     W",
-  "W     WW            WW      WW            WW     W",
-  "W     WW            WW      WW            WW     W",
-  "W     WW            WW      WW            WW     W",
-  "W     WW            WW      WW            WW     W",
-  "W     WW            WW      WW            WW     W",
-  "W     WW            WW      WW            WW     W",
-  "W     WW            WW      WW            WW     W",
-  "W     WW            WW      WW            WW     W",
-  "W     WWWWWWWWWWWWWWWW      WWWWWWWWWWWWWWWW     W",
-  "W     WWWWWWWWWWWWWWWW      WWWWWWWWWWWWWWWW     W",
+   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W          WWWWWWWWWWW      WWWWWWWWWWW          W",
+  "W              WWWW             WWWW             W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                      E                         W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW         W",
+  "W        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW         W",
+  "W        WW                           WW         W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
   "W                                                W",
   "W                                                W",
   "W                                                W",
@@ -611,64 +927,64 @@ while Game:
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "W                                                W",
   "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                E                               W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
+  "W    WWW   WWWW   WWW   WWW   WWW   WWW   WWWW   W",
+  "W    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   W",
+  "W                                           WW   W",
+  "W                                           WW   W",
+  "W                                           WW   W",
+  "W    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WW   W",
+  "W    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WW   W",
+  "W    WW                                WW   WW   W",
+  "W    WW                                WW   WW   W",
+  "W    WW     	                          WW   WW   W",
+  "W    WW   WWWWWWWWWWWWWWWWWWWWWWWWW    WW   WW   W",
+  "W    WW   WWWWWWWWWWWWWWWWWWWWWWWWW    WW   WW   W",
+  "W    WW   WW                           WW   WW   W",
+  "W    WW   WW                           WW   WW   W",
+  "W    WW   WW                           WW   WW   W",
+  "W    WW   WWE                          WW   WW   W",
+  "W    WW   WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WW   W",
+  "W    WW   WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   WW   W",
+  "W    WW                                     WW   W",
+  "W    WW                                     WW   W",
+  "W    WW                                     WW   W",
+  "W    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   W",
+  "W    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW   W",
   "W                                                W",
   "W                                                W",
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   ]
   level5 = [         #50 by 30
-   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                E                               W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
-  "W                                                W",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWW                 WW                   W",
+  "W                           WW                   W",
+  "W                           WW                   W",
+  "W                           WW                   W",
+  "W         WW        WWWWWWWWWW        WW         W",
+  "W         WW        WW      WW        WW         W",
+  "W         WW        WW      WW        WW         W",
+  "W         WW        WW      WWE       WW         W",
+  "W         WWWWWWWWWWWW      WWWWWWWWWWWW         W",
+  "W         WWWWWWWWWWWW      WWWWWWWWWWWW         W",
+  "W                   WW      WW                   W",
+  "W                   WW      WW                   W",
+  "W                   WW      WW                   W",
+  "WWWWWWWW            WW      WW            WW     W",
+  "WWWWWWWW            WW      WW            WW     W",
+  "W                   WW      WWWWWWWWWWWWWWWW     W",
+  "W                   WW                    WW     W",
+  "W                   WW                    WW     W",
+  "W     WWWWWWWWWWWWWWWW             W      WW     W",
+  "W     WWWWWWWWWWWWWWWW      WW      W     WW     W",
+  "W     WW            WW      WW            WW     W",
+  "W     WW            WW      WW            WW     W",
+  "W     WWWWWWWWWWWWWWWW      WWWWWW     WWWWW     W",
+  "W     WWWWWWWWWWWWWWWW      WWWWWW     WWWWW     W",
+  "W                           WW                   W",
+  "W                           WW                   W",
+  "W                           WW                   W",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   ]
   x = y = 0
@@ -693,28 +1009,9 @@ while Game:
   elif Info:
     Play,Info,Intro = info_screen()
   elif Play:
-    Play, Win, Lose, Points = game(player, end_rect)
+    Play, Win, Lose, Points, Intro = game(player, end_rect)
   elif Lose:
     Intro, Lose = game_over()
   elif Win:
+    write_score(Points)
     Intro, Win = game_win(Points)
-
-#######SOCKET Portion###############   	
-s = socket.socket()             # Create a socket object
-host = socket.gethostname()     # Get local machine name
-port = 40000                    # Reserve a port for your service.
-
-s.connect(('131.128.49.109', port))
-# Try get some sleep
-time.sleep(3)
-filename='screenshot.png'
-f = open(filename,'rb')
-l = f.read(1024)
-while (l):
-  s.send(l)
-  l = f.read(1024)
-f.close()
-
-print('Done sending')
-s.close()
-print('connection closed')
