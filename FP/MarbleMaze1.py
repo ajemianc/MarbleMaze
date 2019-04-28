@@ -150,7 +150,7 @@ def black_text(text, font):
     return textSurface, textSurface.get_rect()
     
 def red_text(text, font):
-    textSurface = font.render(text, True, (252,0,0))
+    textSurface = font.render(text, True, (255,0,0))
     return textSurface, textSurface.get_rect()
     
 def pink_text(text, font):
@@ -177,8 +177,17 @@ def Display_timer(timer):
   TextRect.center = ( ((width/2)),(465))
   screen.blit(TextSurf, TextRect)
 
+def Hurry_timer(timer):
+  largeText = pygame.font.Font('freesansbold.ttf',30)
+  if timer <= 5:
+    TextSurf, TextRect = red_text(str(timer), largeText)
+  else:
+    TextSurf, TextRect = white_text(str(timer), largeText)
+  TextRect.center = ( ((width/2)),(height/2))
+  screen.blit(TextSurf, TextRect)
+
 def Display_lvl(Level):
-  Lvl_Names = ["","-->","Reverse","Ferocious Frown","The Viral Spiral","Crazy Cactus"]
+  Lvl_Names = ["","-->","Reverse","Ferocious Frown","The Vile Spiral","Crazy Cactus"]
   largeText = pygame.font.Font('freesansbold.ttf',30)
   TextSurf, TextRect = white_text("Level " +str(Level), largeText)
   TextRect.center = ((width/2),160)
@@ -187,14 +196,23 @@ def Display_lvl(Level):
   TextRect.center = ((width/2),200)
   screen.blit(TextSurf, TextRect)
 
-def quit_button(Wall_color):
+def Secret_lvl():
+  largeText = pygame.font.Font('freesansbold.ttf',30)
+  TextSurf, TextRect = white_text("Secret Level", largeText)
+  TextRect.center = ((width/2),160)
+  screen.blit(TextSurf, TextRect)
+  TextSurf, TextRect = white_text("aMAZEing", largeText)
+  TextRect.center = ((width/2),200)
+  screen.blit(TextSurf, TextRect)
+
+def quit(Wall_color):
     mouse = pygame.mouse.get_pos() 
     largeText = pygame.font.Font('freesansbold.ttf',15)
-    if 455+100 > mouse[0] > 455 and 455+20 > mouse[1] > 455:
-        Quit_button = pygame.draw.rect(screen, (Wall_color), (455,455,60,20))
+    if 455+100 > mouse[0] > 455 and 450+40 > mouse[1] > 450:
+        Quit_button = pygame.draw.rect(screen, (Wall_color), (455,450,60,40))
         TextSurf, TextRect = white_text("Quit", largeText)
     else:
-        Quit_button = pygame.draw.rect(screen, (Wall_color),(455,455,60,20))
+        Quit_button = pygame.draw.rect(screen, (Wall_color),(455,450,60,40))
         TextSurf, TextRect = black_text("Quit", largeText)
     TextRect.center = ((width/2)+80,465)
     screen.blit(TextSurf, TextRect)
@@ -209,6 +227,17 @@ def game_intro():
     move = 0
     move1 = width
     while Intro:
+	screen.fill(BLACK)	
+	mouse = pygame.mouse.get_pos() 
+        if 200+100 > mouse[0] > 200 and 320+40 > mouse[1] > 320:
+            Start_button = pygame.draw.rect(screen, (241, 228, 228), (200,320,100,40))
+        else:
+            Start_button = pygame.draw.rect(screen, (151, 100, 199),(200,320,100,40))
+        
+        if 500+100 > mouse[0] > 500 and 320+40 > mouse[1] > 320:
+            Info_button = pygame.draw.rect(screen,(21, 205, 168), (500,320,100,40)) 
+        else:
+            Info_button = pygame.draw.rect(screen, (9, 154, 151),(500,320,100,40))
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()   
@@ -223,8 +252,6 @@ def game_intro():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-               
-        screen.fill(BLACK)
 
         largeText = pygame.font.Font('freesansbold.ttf',120)
         smallText = pygame.font.Font("freesansbold.ttf",20)
@@ -233,16 +260,6 @@ def game_intro():
         TextRect.center = ((width/2),(height/4))
         screen.blit(TextSurf, TextRect)
         
-        mouse = pygame.mouse.get_pos() 
-        if 200+100 > mouse[0] > 200 and 320+40 > mouse[1] > 320:
-            Start_button = pygame.draw.rect(screen, (241, 228, 228), (200,320,100,40))
-        else:
-            Start_button = pygame.draw.rect(screen, (151, 100, 199),(200,320,100,40))
-        
-        if 500+100 > mouse[0] > 500 and 320+40 > mouse[1] > 320:
-            Info_button = pygame.draw.rect(screen,(21, 205, 168), (500,320,100,40)) 
-        else:
-            Info_button = pygame.draw.rect(screen, (9, 154, 151),(500,320,100,40))
         menu_words = ["Start", "Info"]
         menu_placement = [(250,340), (550,340)]
         
@@ -347,10 +364,92 @@ def info_screen():
         clock.tick(15)
     return Play,Info,Intro
 
+def game_win(Points):
+    
+    Intro = False
+    Win = True
+    
+    while Win:
+        screen.fill((7,13,89))
+        mouse = pygame.mouse.get_pos() 
+        if 3600+100 > mouse[0] > 360 and 320+40 > mouse[1] > 320:
+            Restart_button = pygame.draw.rect(screen, (206,221,239), (350,320,100,40))
+        else:
+            Restart_button = pygame.draw.rect(screen, (88, 147, 212),(350,320,100,40))
+        
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONUP:
+                pos = pygame.mouse.get_pos()   
+                is_inside = Restart_button.collidepoint(pos)
+                if is_inside:    
+                    Win = False
+                    Intro = True
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+               
+        win_words = ["Restart"]
+        win_placement = [(400,340)]       
+        #Start
+        smallText = pygame.font.Font("freesansbold.ttf",20)
+        textSurf, textRect = black_text(win_words[0], smallText)
+        textRect.center = win_placement[0]
+        screen.blit(textSurf, textRect)
+        
+        largeText = pygame.font.Font('freesansbold.ttf',120)
+        TextSurf, TextRect = white_text("YOU WIN", largeText)
+        TextRect.center = ((width/2),(height/4))
+        screen.blit(TextSurf, TextRect)
+        
+        largeText = pygame.font.Font('freesansbold.ttf',50)
+        TextSurf, TextRect = white_text("Score = " +str(Points), largeText)
+        TextRect.center = ( ((width/2)),200)
+        screen.blit(TextSurf, TextRect)
+        pygame.display.update()
+        clock.tick(15)
+    return Intro, Win
+           
+def game_over():
+    
+    Intro = False
+    Lose = True
+    
+    while Lose:
+        screen.fill((95,0,0))
+        mouse = pygame.mouse.get_pos() 
+        if 3600+100 > mouse[0] > 360 and 320+40 > mouse[1] > 320:
+            Restart_button = pygame.draw.rect(screen, (221,0,0), (350,320,100,40))
+        else:
+            Restart_button = pygame.draw.rect(screen, (189, 0, 0),(350,320,100,40))
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONUP:
+                pos = pygame.mouse.get_pos()   
+                is_inside = Restart_button.collidepoint(pos) 
+                if is_inside:    
+                    Lose = False
+                    Intro = True
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+               
+        largeText = pygame.font.Font('freesansbold.ttf',120)
+        TextSurf, TextRect = red_text("Game Over!", largeText)
+        TextRect.center = ((width/2),(height/4))
+        screen.blit(TextSurf, TextRect)
+
+        lose_words = ["Restart"]
+        lose_placement = [(400,340)]       
+        #Restart
+        smallText = pygame.font.Font("freesansbold.ttf",20)
+        textSurf, textRect = red_text(lose_words[0], smallText)
+        textRect.center = lose_placement[0]
+        screen.blit(textSurf, textRect)
+        
+        pygame.display.update()
+        clock.tick(15)
+    return Intro, Lose
 def write_score(Points):
 	
-        print('points', Points)
-
 	f = open(completeName, "r")
 
 	url = completeName
@@ -527,96 +626,7 @@ def write_score(Points):
 
 
 	#Read the names from lines 21, 27, 32, 37, 42
-
-
-
-
-
-def game_win(Points):
-    
-    Intro = False
-    Win = True
-    
-    while Win:
-        screen.fill((7,13,89))
-        mouse = pygame.mouse.get_pos() 
-        if 3600+100 > mouse[0] > 360 and 320+40 > mouse[1] > 320:
-            Restart_button = pygame.draw.rect(screen, (206,221,239), (350,320,100,40))
-        else:
-            Restart_button = pygame.draw.rect(screen, (88, 147, 212),(350,320,100,40))
-        
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONUP:
-                pos = pygame.mouse.get_pos()   
-                is_inside = Restart_button.collidepoint(pos)
-                if is_inside:    
-                    Win = False
-                    Intro = True
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-               
-        win_words = ["Restart"]
-        win_placement = [(400,340)]       
-        #Start
-        smallText = pygame.font.Font("freesansbold.ttf",20)
-        textSurf, textRect = black_text(win_words[0], smallText)
-        textRect.center = win_placement[0]
-        screen.blit(textSurf, textRect)
-        
-        largeText = pygame.font.Font('freesansbold.ttf',120)
-        TextSurf, TextRect = white_text("YOU WIN", largeText)
-        TextRect.center = ((width/2),(height/4))
-        screen.blit(TextSurf, TextRect)
-        
-        largeText = pygame.font.Font('freesansbold.ttf',50)
-        TextSurf, TextRect = white_text("Score = " +str(Points), largeText)
-        TextRect.center = ( ((width/2)),200)
-        screen.blit(TextSurf, TextRect)
-        pygame.display.update()
-        clock.tick(15)
-    return Intro, Win
            
-def game_over():
-    
-    Intro = False
-    Lose = True
-    
-    while Lose:
-        screen.fill((95,0,0))
-        mouse = pygame.mouse.get_pos() 
-        if 3600+100 > mouse[0] > 360 and 320+40 > mouse[1] > 320:
-            Restart_button = pygame.draw.rect(screen, (221,0,0), (350,320,100,40))
-        else:
-            Restart_button = pygame.draw.rect(screen, (189, 0, 0),(350,320,100,40))
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONUP:
-                pos = pygame.mouse.get_pos()   
-                is_inside = Restart_button.collidepoint(pos) 
-                if is_inside:    
-                    Lose = False
-                    Intro = True
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-               
-        largeText = pygame.font.Font('freesansbold.ttf',120)
-        TextSurf, TextRect = red_text("Game Over!", largeText)
-        TextRect.center = ((width/2),(height/4))
-        screen.blit(TextSurf, TextRect)
-
-        lose_words = ["Restart"]
-        lose_placement = [(400,340)]       
-        #Restart
-        smallText = pygame.font.Font("freesansbold.ttf",20)
-        textSurf, textRect = red_text(lose_words[0], smallText)
-        textRect.center = lose_placement[0]
-        screen.blit(textSurf, textRect)
-        
-        pygame.display.update()
-        clock.tick(15)
-    return Intro, Lose
-            
 def updatePoints():
   a, b, c = accel.read()
   float(a)
@@ -636,7 +646,7 @@ def updatePoints():
     Dratio = abs((b/262.0) * 10.0) * 2.0
   else:
     DOWN = Dratio = 0
-  if b > -7:
+  if b > 6:
     UP = 1
     Uratio = abs((b/252.0) * 10.0) * 2.0
   else:
@@ -658,10 +668,11 @@ def game(player, end_rect):
   #Set levels to begin and end with
   Level = 1
   Final_Level = 5
+  Secret_Level = 6
   Points = 100
   lvls_winpoints = [100, 200, 300, 400, 500]
   #Timer values, add extra 5 for the count down
-  lvls_timer = [35, 35, 25, 35, 35]
+  lvls_timer = [35, 35, 15, 35, 35]
   lvl_counter = 0
   timer = lvls_timer[lvl_counter]
   minutes = 0
@@ -674,13 +685,20 @@ def game(player, end_rect):
     seconds = int(time.time() - time_start) - minutes * 60
     #Reset Screen
     screen.fill(Background_color)
+    #Count Down before Starting
     if seconds < 5:
       for wall in walls:
       	pygame.draw.rect(screen, Wall_color, wall.rect)
-      Display_lvl(Level)
+      if Level == 3:
+	pygame.draw.rect(screen, Wall_color, secret_rect)
+      if Level == Secret_Level:
+	Secret_lvl()
+      else:
+	Display_lvl(Level)
       Wait(seconds)
+    #Start
     else:
-      Quit_button = quit_button(Wall_color)
+      Quit_button = quit(Wall_color)
       for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONUP:
           pos = pygame.mouse.get_pos()   
@@ -706,7 +724,9 @@ def game(player, end_rect):
       y= y+6
       marble=pygame.draw.circle(screen,Player_color,(x,y), 12)
       # Time Count Down
-      if timer > 0:
+      if timer > 0 and Level == Secret_Level:
+        timer = 15 - seconds
+      elif timer > 0:
         timer = lvls_timer[lvl_counter] - seconds
       else:
         Play = False
@@ -718,7 +738,7 @@ def game(player, end_rect):
           Points = Points - 1
           if Points <= 0:
             Points = 0         
-      #New Level when reaching goal
+      #New Level when goal reached
       if player.rect.colliderect(end_rect):
         time_start = time.time()
         Points += lvls_winpoints[lvl_counter]
@@ -729,7 +749,6 @@ def game(player, end_rect):
           Play = False
           Win = True
           Lose = False
-#Keara update
         elif Level == 4:
           Level = 5
           del walls[:]
@@ -749,9 +768,7 @@ def game(player, end_rect):
                   x += 16
               y += 16
               x = 0
-#keara update
-        elif Level == 3:
-          print("Level = ", Level)
+        elif Level == 3 or Level == Secret_Level:
           Level = 4
           del walls[:]
           Wall_color = (0, 189, 86)
@@ -760,6 +777,7 @@ def game(player, end_rect):
           Goal_color = (249, 253, 80)
           Start_place = (750,20, 12, 12)
           player.rect = pygame.Rect(Start_place)
+    	  screen.fill(Background_color)
           x = y = 0
           for row in level4:
               for col in row:
@@ -786,6 +804,8 @@ def game(player, end_rect):
                       Wall((x, y))
                   if col == "E":
                       end_rect = pygame.Rect(x, y, 80, 16)
+		  if col == "S":
+                      secret_rect = pygame.Rect(x, y, 64, 16)
                   x += 16
               y += 16
               x = 0
@@ -811,9 +831,36 @@ def game(player, end_rect):
       #Draw screen
       for wall in walls:
       	pygame.draw.rect(screen, Wall_color, wall.rect)
-      Quit_button = quit_button(Wall_color)
+      Quit_button = quit(Wall_color)
       Score(Points)
       Display_timer(timer)
+      if timer <= 10:
+        Hurry_timer(timer)
+      #Secret Level unlocked
+      if Level == 3:
+	pygame.draw.rect(screen, Wall_color, secret_rect)
+	if player.rect.colliderect(secret_rect):
+		  Level = Secret_Level
+		  time_start = time.time()
+                  Points += 200
+                  Points += timer
+		  del walls[:]
+		  Wall_color = (223, 117, 153)
+		  Player_color = (255, 199, 133)
+		  Background_color = (113, 137, 191)
+		  Goal_color = (114, 214, 201)
+		  Start_place = (400,400, 12, 12)
+		  player.rect = pygame.Rect(Start_place)
+		  x = y = 0
+		  for row in secretLevel:
+		      for col in row:
+		          if col == "W":
+		              Wall((x, y))
+		          if col == "E":
+		              end_rect = pygame.Rect(x, y, 80, 16)
+		          x += 16
+		      y += 16
+		      x = 0
       pygame.draw.rect(screen, Goal_color, end_rect)
       pygame.draw.rect(screen, Player_color, player.rect)
       pygame.display.flip()
@@ -900,7 +947,7 @@ while Game:
   "W                                                W",
   "W                                                W",
   "W          WWWWWWWWWWW      WWWWWWWWWWW          W",
-  "W              WWWW             WWWW             W",
+  "W              WWWW             S                W",
   "W                                                W",
   "W                                                W",
   "W                                                W",
@@ -984,6 +1031,38 @@ while Game:
   "W                           WW                   W",
   "W                           WW                   W",
   "W                           WW                   W",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  ]
+  secretLevel = [         #50 by 30
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W          WWWWWWWWWWW      WWWWWWWWWWW          W",
+  "W              WWWW             WWWW             W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                      E                         W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W        WW                           WW         W",
+  "W        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW         W",
+  "W        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW         W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "W                                                W",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   ]
