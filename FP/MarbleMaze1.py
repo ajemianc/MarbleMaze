@@ -448,10 +448,14 @@ def game_over():
         pygame.display.update()
         clock.tick(15)
     return Intro, Lose
+
+#
 def write_score(Points):
 	
-	f = open(completeName, "r")
-
+	#Open Scoreboard.html
+	f = open(completeName, "r")		
+	
+	#Filter out all HTML specific language, e.g. tags/style elements
 	url = completeName
 	html = urllib.urlopen(url).read()
 	soup = BeautifulSoup(html)
@@ -462,22 +466,17 @@ def write_score(Points):
 
 	# get all of the ranks and scores
 	text = soup.get_text()
-	scoresAndRanks = re.findall('\d+', text)
-	print(scoresAndRanks)
+	print(text)					#Display the Scoreboard in the terminal
+	scoresAndRanks = re.findall('\d+', text)	#Further filter out all non-numbers
 
-	#print out all ranks and scores for debugging
-	i = 0
-	while i < len(scoresAndRanks):
-	    print(scoresAndRanks[i])
-	    i += 1
 
-	#make a seperate array for just the high scores
+	#Create an array for high scores only
 	i = 1
-	print('The high Scores you need to beat are:')
 	while i < len(scoresAndRanks):
 	    rawScore = int(scoresAndRanks[i])
 	    highScores.append(rawScore)
-	    i += 2
+	    i += 2					#Even = ranks, Odd = high scores
+	print('The high scores you need to beat:')
 	print(highScores)
 
 	#Extract the names of the high scorers from the HTML doc, save them in highScorers[]
@@ -512,22 +511,18 @@ def write_score(Points):
 	      break
 	print('the high scorers are:')
 	print(highScorers)
-	#print(text)
 
 	f.close()
 	#test to see if it's a high score	
 	newScore = Points
-	isHighScore = 0		#Assume False
-	place = 0		#Which place the user came in	
-	i = 0			#loop count
+	isHighScore = 0					#Assume False
+	place = 0					#Which place the user came in	
+	i = 0						#loop count
 	while i < len(highScores):
 		highscore = highScores[i]
-                print('highscore:', highscore)
-                print('NEW SCORE:', newScore)
     		if newScore >= highscore:
-                  print(isHighScore)
-		  isHighScore = 1	#Make True
-	          place = i		#User placed in this iteration
+		  isHighScore = 1			#Make True
+	          place = i				#User placed in this iteration
 	          break
     		i += 1
 
@@ -548,30 +543,25 @@ def write_score(Points):
         	screen.blit(TextSurf, TextRect)
         	pygame.display.update()
 		print('Congratulations! You have a high score!')
-		replacementName = highScorers[place]
-		print('you are replacing the name', replacementName)
-		replacementScore = str(highScores[place])
-		print('you are replacing the score', replacementScore)
 		toFile = raw_input("What is your name?")
 		print('Great job,', toFile, '!')
-	#Update the high score array
+
+	#Update the "high scores" array
 		previousHighScores=highScores[:]
-		decrementer = 4	#loop backwards so you don't overwrite
-		count = 4 - place
+		decrementer = 4				#loop backwards so you don't overwrite
+		count = 4 - place			#only update up to your rank (1st, 2nd..)
 		
 		while(count != 0):
-			print(decrementer)
 			highScores[decrementer] = highScores[decrementer-1]
 			count -= 1
 			decrementer -= 1
-		highScores[place] = Points
+		highScores[place] = Points		#now insert new high score
 		updatedHighScores=highScores[:]
-		print(updatedHighScores)
-	#Update the names of high scorers array
+
+	#Update the "names of high scorers" array
 		previousHighScorers = highScorers[:]
-		print('the previous high scores are', previousHighScorers)
-		decrementer = 4	#loop backwards so you don't overwrite
-		count = 4 - place
+		decrementer = 4				#loop backwards so you don't overwrite
+		count = 4 - place			#
 		
 		while(count != 0):
 			print(decrementer)
@@ -582,6 +572,7 @@ def write_score(Points):
 		updatedHighScorers = highScorers[:]
 		print('the updated high scorers', updatedHighScorers)
 		updatesRequired = 5-place
+
 	#open the file and update the new high score
 		count = 5
 		index = 0
